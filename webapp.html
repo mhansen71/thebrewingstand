@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alchemist's Apprentice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="gamestyles.css">
+    <style>
+        /* Basic styling enhancements */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align container to top */
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        /* Main game container */
+        #game-container {
+            background-color: #d2b48c;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 4px solid #a0522d;
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Start screen overlay */
+        #start-screen {
+            position: fixed; /* Overlay */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure it's on top */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #start-box {
+            background-color: #d2b48c; /* Match game container */
+            padding: 30px;
+            border-radius: 8px;
+            border: 4px solid #a0522d;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            text-align: center;
+            color: #3a3a3a;
+            max-width: 500px;
+        }
+        #start-box h2 {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        #start-box p {
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        #start-game-button {
+            padding: 12px 25px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #start-game-button:hover {
+            background-color: #4cae4c;
+        }
+
+        /* Other styles */
+        .section-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #3a3a3a;
+            margin-bottom: 10px;
+            text-align: center;
+            border-bottom: 2px solid #a0522d;
+            padding-bottom: 5px;
+            flex-shrink: 0;
+        }
+        .potion-display-area {
+             display: grid;
+             grid-template-columns: 1fr 1fr;
+             gap: 1rem;
+             margin-bottom: 0.25rem;
+             flex-shrink: 0;
+        }
+        .potion-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            border: 2px solid #ccc;
+            overflow: hidden;
+            min-height: 120px; /* Ensure space for name */
+        }
+        .potion-display img {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 5px;
+            image-rendering: pixelated;
+            border: 1px solid #888;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.7em;
+            color: #aaa;
+            flex-shrink: 0;
+        }
+        .potion-display span {
+            font-weight: bold;
+            color: #555;
+            text-align: center;
+            word-break: break-word;
+        }
+         #ingredient-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+            background-color: #c6c6c6;
+            padding: 15px;
+            border-radius: 4px;
+            border: 2px solid #8b8b8b;
+            margin-bottom: 20px;
+        }
+        .ingredient-card {
+            background-color: #e0e0e0;
+            border: 2px solid #a0a0a0;
+            border-radius: 4px;
+            padding: 8px;
+            padding-top: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s, opacity 0.3s;
+            min-height: 90px;
+            aspect-ratio: 1 / 1;
+        }
+        .ingredient-card:hover {
+            background-color: #f5f5f5;
+            border-color: #777;
+        }
+        .ingredient-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+            background-color: #ccc;
+            border-color: #aaa;
+        }
+        .ingredient-card.disabled:hover {
+             background-color: #ccc;
+             border-color: #aaa;
+        }
+        .ingredient-card img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 5px;
+            image-rendering: pixelated;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.7em;
+            color: #aaa;
+            background-color: #fff;
+            border: 1px solid #ccc;
+             flex-shrink: 0;
+        }
+         .ingredient-card span {
+            font-size: 0.85em;
+            text-align: center;
+            color: #333;
+            word-break: break-word;
+            line-height: 1.2;
+         }
+        #feedback {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #fffacd;
+            border: 1px solid #fadf8a;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 40px;
+            word-wrap: break-word;
+            flex-shrink: 0;
+        }
+        #new-game-button {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            margin-top: 20px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+        #new-game-button:hover {
+            background-color: #4cae4c;
+        }
+        #timer-container {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            background-color: #eee;
+            padding: 5px;
+            border-radius: 4px;
+            border: 2px solid #ccc;
+            flex-shrink: 0;
+        }
+        #timer-display {
+            font-weight: bold;
+            color: #333;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        /* Utility class to hide elements */
+        .hidden {
+            display: none !important;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="common nav">
+        <a href="scratch.html">Scratch</a>
+    </div>
+    <div id="start-screen">
+        <div id="start-box">
+            <h2>Welcome to Alchemist's Apprentice!</h2>
+            <p>
+                Your goal is to brew the target potion shown at the top left.
+                Start with the Water Bottle (top right) and click the ingredients
+                in the correct order. Make three mistakes on a step, and you'll get a hint!
+                Good luck, apprentice!
+            </p>
+            <button id="start-game-button">Start Brewing!</button>
+        </div>
+    </div>
+
+    <div id="game-container" class="hidden"> <h1 class="text-2xl font-bold text-center mb-4 text-gray-700">Alchemist's Apprentice</h1>
+
+        <div class="potion-display-area">
+            <div class="potion-display">
+                <div class="section-title">Target Potion</div>
+                <img id="target-potion-img" src="placeholder.png" alt="Target Potion">
+                <span id="target-potion-name">Loading...</span>
+            </div>
+            <div class="potion-display">
+                <div class="section-title">Current Potion</div>
+                <img id="current-potion-img" src="placeholder.png" alt="Current Potion">
+                <span id="current-potion-name">Water Bottle</span>
+            </div>
+        </div>
+
+        <div id="timer-container">
+             Time Elapsed: <span id="timer-display">0.000s</span>
+        </div>
+
+        <div class="section-title">Select Ingredient</div>
+        <div id="ingredient-grid"></div>
+        <div id="feedback">Select the first ingredient!</div>
+
+        <button id="new-game-button">New Game</button>
+        <script>
+        // --- DATA ---
+        const PLACEHOLDER_IMAGE_SRC = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; // Transparent pixel
+
+        // --- Potion Recipes Data ---
+        const POTION_RECIPES = {
+            "Potion of Swiftness": { steps: ["Nether Wart", "Sugar"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/58/Potion_of_Swiftness_JE3.png/revision/latest?cb=20230303160257", base: "Awkward Potion" },
+            "Potion of Leaping": { steps: ["Nether Wart", "Rabbit's Foot"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/04/Potion_of_Leaping_JE3.png/revision/latest?cb=20230303160250", base: "Awkward Potion" },
+            "Potion of Strength": { steps: ["Nether Wart", "Blaze Powder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f0/Potion_of_Strength_JE3.png/revision/latest?cb=20230303163006", base: "Awkward Potion" },
+            "Potion of Healing": { steps: ["Nether Wart", "Glistering Melon Slice"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/3/3e/Potion_of_Healing_JE2_BE2.png/revision/latest?cb=20191027040649", base: "Awkward Potion" },
+            "Potion of Poison": { steps: ["Nether Wart", "Spider Eye"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/dc/Potion_of_Poison_JE3.png/revision/latest?cb=20230303160254", base: "Awkward Potion" },
+            "Potion of Regeneration": { steps: ["Nether Wart", "Ghast Tear"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/06/Potion_of_Regeneration_JE2_BE2.png/revision/latest?cb=20191027040819", base: "Awkward Potion" },
+            "Potion of Fire Resistance": { steps: ["Nether Wart", "Magma Cream"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/e/ee/Potion_of_Fire_Resistance_JE3.png/revision/latest?cb=20230303160246", base: "Awkward Potion" },
+            "Potion of Water Breathing": { steps: ["Nether Wart", "Pufferfish"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/1/1e/Potion_of_Water_Breathing_JE3.png/revision/latest?cb=20230303160259", base: "Awkward Potion" },
+            "Potion of Night Vision": { steps: ["Nether Wart", "Golden Carrot"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/53/Potion_of_Night_Vision_JE3.png/revision/latest?cb=20230303160253", base: "Awkward Potion" },
+            "Potion of Slow Falling": { steps: ["Nether Wart", "Phantom Membrane"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/b7/Potion_of_Slow_Falling_JE2_BE2.png/revision/latest?cb=20191027040830", base: "Awkward Potion" },
+            "Potion of the Turtle Master": { steps: ["Nether Wart", "Turtle Shell"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/8b/Potion_of_the_Turtle_Master_JE3.png/revision/latest?cb=20230303170448", base: "Awkward Potion" },
+            "Potion of Weakness": { steps: ["Fermented Spider Eye"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/73/Potion_of_Weakness_JE2_BE2.png/revision/latest?cb=20191027041010", base: "Water Bottle" },
+            "Potion of Strength II": { steps: ["Nether Wart", "Blaze Powder", "Glowstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f0/Potion_of_Strength_JE3.png/revision/latest?cb=20230303163006", base: "Awkward Potion" },
+            "Potion of Leaping II": { steps: ["Nether Wart", "Rabbit's Foot", "Glowstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/04/Potion_of_Leaping_JE3.png/revision/latest?cb=20230303160250", base: "Awkward Potion" },
+            "Potion of Healing II": { steps: ["Nether Wart", "Glistering Melon Slice", "Glowstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/3/3e/Potion_of_Healing_JE2_BE2.png/revision/latest?cb=20191027040649", base: "Awkward Potion" },
+            "Potion of Poison II": { steps: ["Nether Wart", "Spider Eye", "Glowstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/dc/Potion_of_Poison_JE3.png/revision/latest?cb=20230303160254", base: "Awkward Potion" },
+            "Potion of Swiftness II": { steps: ["Nether Wart", "Sugar", "Glowstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/58/Potion_of_Swiftness_JE3.png/revision/latest?cb=20230303160257", base: "Awkward Potion" },
+            "Potion of Swiftness (8:00)": { steps: ["Nether Wart", "Sugar", "Redstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/58/Potion_of_Swiftness_JE3.png/revision/latest?cb=20230303160257", base: "Awkward Potion" },
+            "Potion of Leaping (8:00)": { steps: ["Nether Wart", "Rabbit's Foot", "Redstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/04/Potion_of_Leaping_JE3.png/revision/latest?cb=20230303160250", base: "Awkward Potion" },
+            "Potion of Strength (8:00)": { steps: ["Nether Wart", "Blaze Powder", "Redstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f0/Potion_of_Strength_JE3.png/revision/latest?cb=20230303163006", base: "Awkward Potion" },
+            "Potion of Poison (1:30)": { steps: ["Nether Wart", "Spider Eye", "Redstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/dc/Potion_of_Poison_JE3.png/revision/latest?cb=20230303160254", base: "Awkward Potion" },
+            "Potion of Regeneration (1:30)": { steps: ["Nether Wart", "Ghast Tear", "Redstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/06/Potion_of_Regeneration_JE2_BE2.png/revision/latest?cb=20191027040819", base: "Awkward Potion" },
+            "Potion of Fire Resistance (8:00)": { steps: ["Nether Wart", "Magma Cream", "Redstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/e/ee/Potion_of_Fire_Resistance_JE3.png/revision/latest?cb=20230303160246", base: "Awkward Potion" },
+            "Potion of Water Breathing (8:00)": { steps: ["Nether Wart", "Pufferfish", "Redstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/1/1e/Potion_of_Water_Breathing_JE3.png/revision/latest?cb=20230303160259", base: "Awkward Potion" },
+            "Potion of Night Vision (8:00)": { steps: ["Nether Wart", "Golden Carrot", "Redstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/53/Potion_of_Night_Vision_JE3.png/revision/latest?cb=20230303160253", base: "Awkward Potion" },
+            "Potion of Slow Falling (4:00)": { steps: ["Nether Wart", "Phantom Membrane", "Redstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/b7/Potion_of_Slow_Falling_JE2_BE2.png/revision/latest?cb=20191027040830", base: "Awkward Potion" },
+            "Potion of Weakness (4:00)": { steps: ["Fermented Spider Eye", "Redstone Dust"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/73/Potion_of_Weakness_JE2_BE2.png/revision/latest?cb=20191027041010", base: "Water Bottle" },
+            "Potion of Harming": { steps: ["Nether Wart", "Glistering Melon Slice", "Fermented Spider Eye"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/70/Potion_of_Harming_JE3.png/revision/latest?cb=20230303160247", base: "Awkward Potion" },
+            "Potion of Harming II": { steps: ["Nether Wart", "Glistering Melon Slice", "Glowstone Dust", "Fermented Spider Eye"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/70/Potion_of_Harming_JE3.png/revision/latest?cb=20230303160247", base: "Awkward Potion" },
+            "Potion of Slowness": { steps: ["Nether Wart", "Sugar", "Fermented Spider Eye"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/c/c2/Potion_of_Slowness_JE3.png/revision/latest?cb=20230303160256", base: "Awkward Potion" },
+            "Potion of Slowness (4:00)": { steps: ["Nether Wart", "Sugar", "Redstone Dust", "Fermented Spider Eye"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/c/c2/Potion_of_Slowness_JE3.png/revision/latest?cb=20230303160256", base: "Awkward Potion" },
+            "Potion of Invisibility": { steps: ["Nether Wart", "Golden Carrot", "Fermented Spider Eye"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/af/Potion_of_Invisibility_JE3.png/revision/latest?cb=20230303160249", base: "Awkward Potion" },
+            "Potion of Invisibility (8:00)": { steps: ["Nether Wart", "Golden Carrot", "Redstone Dust", "Fermented Spider Eye"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/af/Potion_of_Invisibility_JE3.png/revision/latest?cb=20230303160249", base: "Awkward Potion" },
+            "Splash Potion of Swiftness": { steps: ["Nether Wart", "Sugar", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d3/Splash_Potion_of_Swiftness_JE3.png/revision/latest?cb=20230303163021", base: "Awkward Potion" },
+            "Splash Potion of Leaping": { steps: ["Nether Wart", "Rabbit's Foot", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/42/Splash_Potion_of_Leaping_JE3.png/revision/latest?cb=20230303163011", base: "Awkward Potion" },
+            "Splash Potion of Strength": { steps: ["Nether Wart", "Blaze Powder", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/65/Splash_Potion_of_Strength_JE3.png/revision/latest?cb=20230303163019", base: "Awkward Potion" },
+            "Splash Potion of Healing": { steps: ["Nether Wart", "Glistering Melon Slice", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/72/Splash_Potion_of_Healing_JE2_BE2.png/revision/latest?cb=20191027041224", base: "Awkward Potion" },
+            "Splash Potion of Poison": { steps: ["Nether Wart", "Spider Eye", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/c/c6/Splash_Potion_of_Poison_JE3.png/revision/latest?cb=20230303163016", base: "Awkward Potion" },
+            "Splash Potion of Regeneration": { steps: ["Nether Wart", "Ghast Tear", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/e/e5/Splash_Potion_of_Regeneration_JE2_BE2.png/revision/latest?cb=20191027041322", base: "Awkward Potion" },
+            "Splash Potion of Fire Resistance": { steps: ["Nether Wart", "Magma Cream", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/a9/Splash_Potion_of_Fire_Resistance_JE3.png/revision/latest?cb=20230303163007", base: "Awkward Potion" },
+            "Splash Potion of Water Breathing": { steps: ["Nether Wart", "Pufferfish", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/bd/Splash_Potion_of_Water_Breathing_JE3.png/revision/latest?cb=20230303163022", base: "Awkward Potion" },
+            "Splash Potion of Night Vision": { steps: ["Nether Wart", "Golden Carrot", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/6f/Splash_Potion_of_Night_Vision_JE3.png/revision/latest?cb=20230303163015", base: "Awkward Potion" },
+            "Splash Potion of Weakness": { steps: ["Fermented Spider Eye", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/ab/Splash_Potion_of_Weakness_JE2_BE2.png/revision/latest?cb=20191027041455", base: "Water Bottle" },
+            "Splash Potion of Strength II": { steps: ["Nether Wart", "Blaze Powder", "Glowstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/65/Splash_Potion_of_Strength_JE3.png/revision/latest?cb=20230303163019", base: "Awkward Potion" },
+            "Splash Potion of Leaping II": { steps: ["Nether Wart", "Rabbit's Foot", "Glowstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/42/Splash_Potion_of_Leaping_JE3.png/revision/latest?cb=20230303163011", base: "Awkward Potion" },
+            "Splash Potion of Healing II": { steps: ["Nether Wart", "Glistering Melon Slice", "Glowstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/72/Splash_Potion_of_Healing_JE2_BE2.png/revision/latest?cb=20191027041224", base: "Awkward Potion" },
+            "Splash Potion of Poison II": { steps: ["Nether Wart", "Spider Eye", "Glowstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/c/c6/Splash_Potion_of_Poison_JE3.png/revision/latest?cb=20230303163016", base: "Awkward Potion" },
+            "Splash Potion of Swiftness II": { steps: ["Nether Wart", "Sugar", "Glowstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d3/Splash_Potion_of_Swiftness_JE3.png/revision/latest?cb=20230303163021", base: "Awkward Potion" },
+            "Splash Potion of Swiftness (8:00)": { steps: ["Nether Wart", "Sugar", "Redstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d3/Splash_Potion_of_Swiftness_JE3.png/revision/latest?cb=20230303163021", base: "Awkward Potion" },
+            "Splash Potion of Leaping (8:00)": { steps: ["Nether Wart", "Rabbit's Foot", "Redstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/42/Splash_Potion_of_Leaping_JE3.png/revision/latest?cb=20230303163011", base: "Awkward Potion" },
+            "Splash Potion of Strength (8:00)": { steps: ["Nether Wart", "Blaze Powder", "Redstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/65/Splash_Potion_of_Strength_JE3.png/revision/latest?cb=20230303163019", base: "Awkward Potion" },
+            "Splash Potion of Poison (1:30)": { steps: ["Nether Wart", "Spider Eye", "Redstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/c/c6/Splash_Potion_of_Poison_JE3.png/revision/latest?cb=20230303163016", base: "Awkward Potion" },
+            "Splash Potion of Regeneration (1:30)": { steps: ["Nether Wart", "Ghast Tear", "Redstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/e/e5/Splash_Potion_of_Regeneration_JE2_BE2.png/revision/latest?cb=20191027041322", base: "Awkward Potion" },
+            "Splash Potion of Fire Resistance (8:00)": { steps: ["Nether Wart", "Magma Cream", "Redstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/a9/Splash_Potion_of_Fire_Resistance_JE3.png/revision/latest?cb=20230303163007", base: "Awkward Potion" },
+            "Splash Potion of Water Breathing (8:00)": { steps: ["Nether Wart", "Pufferfish", "Redstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/bd/Splash_Potion_of_Water_Breathing_JE3.png/revision/latest?cb=20230303163022", base: "Awkward Potion" },
+            "Splash Potion of Night Vision (8:00)": { steps: ["Nether Wart", "Golden Carrot", "Redstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/6f/Splash_Potion_of_Night_Vision_JE3.png/revision/latest?cb=20230303163015", base: "Awkward Potion" },
+            "Splash Potion of Weakness (4:00)": { steps: ["Fermented Spider Eye", "Redstone Dust", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/ab/Splash_Potion_of_Weakness_JE2_BE2.png/revision/latest?cb=20191027041455", base: "Water Bottle" },
+            "Splash Potion of Harming": { steps: ["Nether Wart", "Glistering Melon Slice", "Fermented Spider Eye", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/b4/Splash_Potion_of_Harming_JE3.png/revision/latest?cb=20230303163009", base: "Awkward Potion" },
+            "Splash Potion of Harming II": { steps: ["Nether Wart", "Glistering Melon Slice", "Glowstone Dust", "Fermented Spider Eye", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/b4/Splash_Potion_of_Harming_JE3.png/revision/latest?cb=20230303163009", base: "Awkward Potion" },
+            "Splash Potion of Slowness": { steps: ["Nether Wart", "Sugar", "Fermented Spider Eye", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d9/Splash_Potion_of_Slowness_JE3.png/revision/latest?cb=20230303163017", base: "Awkward Potion" },
+            "Splash Potion of Slowness (4:00)": { steps: ["Nether Wart", "Sugar", "Redstone Dust", "Fermented Spider Eye", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d9/Splash_Potion_of_Slowness_JE3.png/revision/latest?cb=20230303163017", base: "Awkward Potion" },
+            "Splash Potion of Invisibility": { steps: ["Nether Wart", "Golden Carrot", "Fermented Spider Eye", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/9/96/Splash_Potion_of_Invisibility_JE3.png/revision/latest?cb=20230303163010", base: "Awkward Potion" },
+            "Splash Potion of Invisibility (8:00)": { steps: ["Nether Wart", "Golden Carrot", "Redstone Dust", "Fermented Spider Eye", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/9/96/Splash_Potion_of_Invisibility_JE3.png/revision/latest?cb=20230303163010", base: "Awkward Potion" },
+            "Splash Potion of Slow Falling": { steps: ["Nether Wart", "Phantom Membrane", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/b6/Splash_Potion_of_Slow_Falling_JE2_BE2.png/revision/latest?cb=20191027041332", base: "Awkward Potion" },
+            "Splash Potion of the Turtle Master": { steps: ["Nether Wart", "Turtle Shell", "Gunpowder"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/fa/Splash_Potion_of_the_Turtle_Master_JE3.png/revision/latest?cb=20230303170450", base: "Awkward Potion" },
+            "Lingering Potion of Swiftness": { steps: ["Nether Wart", "Sugar", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/89/Lingering_Potion_of_Swiftness_JE3.png/revision/latest?cb=20230303164102", base: "Awkward Potion" },
+            "Lingering Potion of Leaping": { steps: ["Nether Wart", "Rabbit's Foot", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/9/97/Lingering_Potion_of_Leaping_JE3.png/revision/latest?cb=20230303164053", base: "Awkward Potion" },
+            "Lingering Potion of Strength": { steps: ["Nether Wart", "Blaze Powder", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/81/Lingering_Potion_of_Strength_JE3.png/revision/latest?cb=20230303164100", base: "Awkward Potion" },
+            "Lingering Potion of Healing": { steps: ["Nether Wart", "Glistering Melon Slice", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/c/c2/Lingering_Potion_of_Healing_JE2_BE2.png/revision/latest?cb=20200518192752", base: "Awkward Potion" },
+            "Lingering Potion of Poison": { steps: ["Nether Wart", "Spider Eye", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/e/e3/Lingering_Potion_of_Poison_JE3.png/revision/latest?cb=20230303164057", base: "Awkward Potion" },
+            "Lingering Potion of Regeneration": { steps: ["Nether Wart", "Ghast Tear", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/9/98/Lingering_Potion_of_Regeneration_JE2_BE2.png/revision/latest?cb=20200518192621", base: "Awkward Potion" },
+            "Lingering Potion of Fire Resistance": { steps: ["Nether Wart", "Magma Cream", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/4a/Lingering_Potion_of_Fire_Resistance_JE3.png/revision/latest?cb=20230303164049", base: "Awkward Potion" },
+            "Lingering Potion of Water Breathing": { steps: ["Nether Wart", "Pufferfish", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/1/11/Lingering_Potion_of_Water_Breathing_JE3.png/revision/latest?cb=20230303164103", base: "Awkward Potion" },
+            "Lingering Potion of Night Vision": { steps: ["Nether Wart", "Golden Carrot", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/8c/Lingering_Potion_of_Night_Vision_JE3.png/revision/latest?cb=20230303164056", base: "Awkward Potion" },
+            "Lingering Potion of Weakness": { steps: ["Fermented Spider Eye", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/2/20/Lingering_Potion_of_Weakness_JE2_BE2.png/revision/latest?cb=20200518192818", base: "Water Bottle" },
+            "Lingering Potion of Strength II": { steps: ["Nether Wart", "Blaze Powder", "Glowstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/81/Lingering_Potion_of_Strength_JE3.png/revision/latest?cb=20230303164100", base: "Awkward Potion" },
+            "Lingering Potion of Leaping II": { steps: ["Nether Wart", "Rabbit's Foot", "Glowstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/9/97/Lingering_Potion_of_Leaping_JE3.png/revision/latest?cb=20230303164053", base: "Awkward Potion" },
+            "Lingering Potion of Healing II": { steps: ["Nether Wart", "Glistering Melon Slice", "Glowstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/c/c2/Lingering_Potion_of_Healing_JE2_BE2.png/revision/latest?cb=20200518192752", base: "Awkward Potion" },
+            "Lingering Potion of Poison II": { steps: ["Nether Wart", "Spider Eye", "Glowstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/e/e3/Lingering_Potion_of_Poison_JE3.png/revision/latest?cb=20230303164057", base: "Awkward Potion" },
+            "Lingering Potion of Swiftness II": { steps: ["Nether Wart", "Sugar", "Glowstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/89/Lingering_Potion_of_Swiftness_JE3.png/revision/latest?cb=20230303164102", base: "Awkward Potion" },
+            "Lingering Potion of Swiftness (8:00)": { steps: ["Nether Wart", "Sugar", "Redstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/89/Lingering_Potion_of_Swiftness_JE3.png/revision/latest?cb=20230303164102", base: "Awkward Potion" },
+            "Lingering Potion of Leaping (8:00)": { steps: ["Nether Wart", "Rabbit's Foot", "Redstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/9/97/Lingering_Potion_of_Leaping_JE3.png/revision/latest?cb=20230303164053", base: "Awkward Potion" },
+            "Lingering Potion of Strength (8:00)": { steps: ["Nether Wart", "Blaze Powder", "Redstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/81/Lingering_Potion_of_Strength_JE3.png/revision/latest?cb=20230303164100", base: "Awkward Potion" },
+            "Lingering Potion of Poison (1:30)": { steps: ["Nether Wart", "Spider Eye", "Redstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/e/e3/Lingering_Potion_of_Poison_JE3.png/revision/latest?cb=20230303164057", base: "Awkward Potion" },
+            "Lingering Potion of Regeneration (1:30)": { steps: ["Nether Wart", "Ghast Tear", "Redstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/9/98/Lingering_Potion_of_Regeneration_JE2_BE2.png/revision/latest?cb=20200518192621", base: "Awkward Potion" },
+            "Lingering Potion of Fire Resistance (8:00)": { steps: ["Nether Wart", "Magma Cream", "Redstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/4a/Lingering_Potion_of_Fire_Resistance_JE3.png/revision/latest?cb=20230303164049", base: "Awkward Potion" },
+            "Lingering Potion of Water Breathing (8:00)": { steps: ["Nether Wart", "Pufferfish", "Redstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/1/11/Lingering_Potion_of_Water_Breathing_JE3.png/revision/latest?cb=20230303164103", base: "Awkward Potion" },
+            "Lingering Potion of Night Vision (8:00)": { steps: ["Nether Wart", "Golden Carrot", "Redstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/8c/Lingering_Potion_of_Night_Vision_JE3.png/revision/latest?cb=20230303164056", base: "Awkward Potion" },
+            "Lingering Potion of Weakness (4:00)": { steps: ["Fermented Spider Eye", "Redstone Dust", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/2/20/Lingering_Potion_of_Weakness_JE2_BE2.png/revision/latest?cb=20200518192818", base: "Water Bottle" },
+            "Lingering Potion of Harming": { steps: ["Nether Wart", "Glistering Melon Slice", "Fermented Spider Eye", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/64/Lingering_Potion_of_Harming_JE3.png/revision/latest?cb=20230303164050", base: "Awkward Potion" },
+            "Lingering Potion of Harming II": { steps: ["Nether Wart", "Glistering Melon Slice", "Glowstone Dust", "Fermented Spider Eye", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/64/Lingering_Potion_of_Harming_JE3.png/revision/latest?cb=20230303164050", base: "Awkward Potion" },
+            "Lingering Potion of Slowness": { steps: ["Nether Wart", "Sugar", "Fermented Spider Eye", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/41/Lingering_Potion_of_Slowness_JE3.png/revision/latest?cb=20230303164059", base: "Awkward Potion" },
+            "Lingering Potion of Slowness (4:00)": { steps: ["Nether Wart", "Sugar", "Redstone Dust", "Fermented Spider Eye", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/41/Lingering_Potion_of_Slowness_JE3.png/revision/latest?cb=20230303164059", base: "Awkward Potion" },
+            "Lingering Potion of Invisibility": { steps: ["Nether Wart", "Golden Carrot", "Fermented Spider Eye", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/55/Lingering_Potion_of_Invisibility_JE3.png/revision/latest?cb=20230303164052", base: "Awkward Potion" },
+            "Lingering Potion of Invisibility (8:00)": { steps: ["Nether Wart", "Golden Carrot", "Redstone Dust", "Fermented Spider Eye", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/55/Lingering_Potion_of_Invisibility_JE3.png/revision/latest?cb=20230303164052", base: "Awkward Potion" },
+            "Lingering Potion of Slow Falling": { steps: ["Nether Wart", "Phantom Membrane", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/fd/Lingering_Potion_of_Slow_Falling_JE2_BE2.png/revision/latest?cb=20200518192939", base: "Awkward Potion" },
+            "Lingering Potion of the Turtle Master": { steps: ["Nether Wart", "Turtle Shell", "Gunpowder", "Dragon's Breath"], image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/e/ef/Lingering_Potion_of_the_Turtle_Master_JE3.png/revision/latest?cb=20230303170447", base: "Awkward Potion" },
+        };
+
+        // --- Intermediate Potion Data ---
+        const INTERMEDIATE_POTIONS = {
+             "Nether Wart": { name: "Awkward Potion", image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/75/Water_Bottle_JE2_BE2.png/revision/latest?cb=20191027055423" },
+             // Add more intermediate display logic if needed
+        };
+
+        // --- Ingredient Data ---
+        const INGREDIENTS = {
+            "Nether Wart": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/3/3f/Nether_Wart_%28item%29_JE2_BE1.png/revision/latest?cb=20190908024827" }, "Sugar": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/b7/Sugar_JE2_BE2.png/revision/latest?cb=20190531031745" }, "Rabbit's Foot": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/c/c0/Rabbit%27s_Foot_JE3_BE2.png/revision/latest?cb=20190501034244" },
+            "Blaze Powder": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/7c/Blaze_Powder_JE2_BE1.png/revision/latest?cb=20190403182032" }, "Glistering Melon Slice": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/e/e7/Glistering_Melon_Slice_JE3_BE2.png/revision/latest?cb=20190531032839" }, "Spider Eye": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/1/1a/Spider_Eye_JE2_BE2.png/revision/latest?cb=20190521032215" },
+            "Ghast Tear": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/c/c5/Ghast_Tear_JE2_BE2.png/revision/latest?cb=20190501043739" }, "Magma Cream": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/08/Magma_Cream_JE3_BE2.png/revision/latest?cb=20190501035730" }, "Pufferfish": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/02/Pufferfish_%28item%29_JE5_BE2.png/revision/latest?cb=20191230044451" },
+            "Golden Carrot": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/aa/Golden_Carrot_JE4_BE2.png/revision/latest?cb=20200430031437" }, "Turtle Shell": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/42/Turtle_Shell_%28item%29_JE1_BE1.png/revision/latest?cb=20200511203139" }, "Phantom Membrane": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/5c/Phantom_Membrane_JE2_BE2.png/revision/latest?cb=20190501045423" },
+            "Fermented Spider Eye": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/85/Fermented_Spider_Eye_JE2_BE2.png/revision/latest?cb=20191026005229" }, "Glowstone Dust": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/2/25/Glowstone_Dust_JE2_BE2.png/revision/latest?cb=20190430044519" }, "Redstone Dust": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/e/e1/Redstone_Dust_JE2_BE2.png/revision/latest?cb=20210427032319" },
+            "Gunpowder": { image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/40/Gunpowder_JE2_BE2.png/revision/latest?cb=20190816222615" }, "Dragon's Breath": { image: "https://static.wikia.nocookie.net/minecraft/images/7/7e/Dragon%27s_Breath_Potion.png/revision/latest?cb=20190929233904" }
+        };
+
+        // --- DOM Element References ---
+        const gameContainer = document.getElementById('game-container'); // Need ref to show/hide
+        const startScreen = document.getElementById('start-screen');
+        const startGameButton = document.getElementById('start-game-button');
+        const targetPotionImg = document.getElementById('target-potion-img');
+        const targetPotionName = document.getElementById('target-potion-name');
+        const currentPotionImg = document.getElementById('current-potion-img');
+        const currentPotionName = document.getElementById('current-potion-name');
+        const ingredientGrid = document.getElementById('ingredient-grid');
+        const feedback = document.getElementById('feedback');
+        const newGameButton = document.getElementById('new-game-button');
+        const timerDisplay = document.getElementById('timer-display');
+
+        // --- Game State Variables ---
+        let targetPotionKey = null;
+        let currentRecipe = [];
+        let stepsTaken = 0;
+        let isGameOver = false;
+        let startTime = 0;
+        let timerInterval = null;
+        let penaltyTimeout = null;
+        let incorrectGuessesCurrentStep = 0;
+        let gameHasStarted = false; // NEW: Flag for initial start
+
+        // --- Helper Function: Image Error Handling ---
+        function setImage(imgElement, src, altText) {
+            imgElement.src = src || PLACEHOLDER_IMAGE_SRC;
+            imgElement.alt = altText;
+            imgElement.onerror = () => { imgElement.src = PLACEHOLDER_IMAGE_SRC; };
+            imgElement.onload = () => { };
+        }
+
+        // --- Timer Control Functions ---
+        function startTimer() {
+            // Only start if the game has officially begun
+            if (!gameHasStarted) return;
+            startTime = performance.now();
+            if (timerInterval) clearInterval(timerInterval);
+            timerDisplay.textContent = '0.000s';
+            timerInterval = setInterval(updateTimerDisplay, 50);
+        }
+        function stopTimer() {
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            const finalTimeMs = startTime > 0 ? performance.now() - startTime : 0;
+            timerDisplay.textContent = `${(finalTimeMs / 1000).toFixed(3)}s`;
+            return finalTimeMs;
+        }
+        function updateTimerDisplay() {
+            if (!isGameOver && startTime > 0 && gameHasStarted) { // Check gameHasStarted
+                 const elapsedTime = performance.now() - startTime;
+                 timerDisplay.textContent = `${(elapsedTime / 1000).toFixed(3)}s`;
+            }
+        }
+        function resetTimer() {
+            stopTimer(); startTime = 0; timerDisplay.textContent = '0.000s';
+        }
+
+        // --- Penalty Functions ---
+        function applyPenalty() {
+            const cards = ingredientGrid.querySelectorAll('.ingredient-card');
+            cards.forEach(card => card.classList.add('disabled'));
+            if (penaltyTimeout) clearTimeout(penaltyTimeout);
+            penaltyTimeout = setTimeout(() => {
+                removePenalty(); penaltyTimeout = null;
+            }, 3000);
+        }
+        function removePenalty() {
+            const cards = ingredientGrid.querySelectorAll('.ingredient-card');
+            cards.forEach(card => card.classList.remove('disabled'));
+        }
+
+        // --- Core Game Logic Functions ---
+        function getRandomPotionKey() {
+            const keys = Object.keys(POTION_RECIPES);
+            return keys[Math.floor(Math.random() * keys.length)];
+        }
+        function getPotionData(potionKey) {
+             if (potionKey === "Water Bottle") return { name: "Water Bottle", image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/75/Water_Bottle_JE2_BE2.png/revision/latest?cb=20191027055423" };
+             if (potionKey === "Awkward Potion") return { name: "Awkward Potion", image: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/75/Water_Bottle_JE2_BE2.png/revision/latest?cb=20191027055423" }; // Should be awkward potion image
+             if (POTION_RECIPES[potionKey]) {
+                 return { name: potionKey, image: POTION_RECIPES[potionKey].image };
+             }
+             // Simplified intermediate logic - can be expanded
+             const lastIngredient = currentRecipe.length > 0 ? currentRecipe[currentRecipe.length - 1] : null;
+             if (lastIngredient && INTERMEDIATE_POTIONS[lastIngredient]) {
+                 return INTERMEDIATE_POTIONS[lastIngredient];
+             }
+             return { name: "Unknown Potion", image: "placeholder.png" };
+        }
+
+        function updateDisplay() {
+            const targetData = getPotionData(targetPotionKey);
+            setImage(targetPotionImg, targetData.image, targetData.name);
+            targetPotionName.textContent = targetData.name;
+
+            let currentPotionDisplayKey = "Water Bottle";
+             if (stepsTaken > 0 && targetPotionKey && POTION_RECIPES[targetPotionKey]) {
+                 const recipe = POTION_RECIPES[targetPotionKey];
+                 const recipeSteps = recipe.steps;
+
+                 if (stepsTaken === recipeSteps.length) {
+                     currentPotionDisplayKey = targetPotionKey;
+                 } else if (stepsTaken > 0 && stepsTaken < recipeSteps.length) {
+                     // Try finding an exact match for the current steps
+                     let intermediateKey = Object.keys(POTION_RECIPES).find(key => {
+                         const iRecipe = POTION_RECIPES[key];
+                         if (iRecipe.steps.length === stepsTaken && recipe.base === iRecipe.base) {
+                             return recipeSteps.slice(0, stepsTaken).every((step, i) => step === iRecipe.steps[i]);
+                         }
+                         return false;
+                     });
+                     if (intermediateKey) {
+                         currentPotionDisplayKey = intermediateKey;
+                     } else if (currentRecipe[0] === "Nether Wart") {
+                          currentPotionDisplayKey = "Awkward Potion";
+                     } else if (currentRecipe[0] === "Fermented Spider Eye" && recipe.base === "Water Bottle") {
+                         currentPotionDisplayKey = "Potion of Weakness";
+                     } else {
+                         currentPotionDisplayKey = "Intermediate"; // Fallback
+                     }
+                 }
+             }
+            const currentData = getPotionData(currentPotionDisplayKey);
+            setImage(currentPotionImg, currentData.image, currentData.name);
+            currentPotionName.textContent = currentData.name;
+        }
+
+        // Fisher-Yates (aka Knuth) Shuffle algorithm
+        function shuffleArray(array) {
+            let currentIndex = array.length, randomIndex;
+            // While there remain elements to shuffle.
+            while (currentIndex > 0) {
+                // Pick a remaining element.
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                // And swap it with the current element.
+                [array[currentIndex], array[randomIndex]] = [
+                    array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+
+        function populateIngredients() {
+            ingredientGrid.innerHTML = ''; // Clear existing grid
+            const ingredientKeys = Object.keys(INGREDIENTS); // Get ingredient names
+            const shuffledKeys = shuffleArray(ingredientKeys); // Shuffle the names
+
+            // Populate grid using shuffled order
+            shuffledKeys.forEach(ingredientKey => {
+                const card = document.createElement('div');
+                card.className = 'ingredient-card';
+                card.dataset.ingredient = ingredientKey;
+                const img = document.createElement('img');
+                setImage(img, INGREDIENTS[ingredientKey].image, ingredientKey);
+                const span = document.createElement('span');
+                span.textContent = ingredientKey;
+                card.appendChild(img);
+                card.appendChild(span);
+                card.addEventListener('click', () => handleIngredientSelect(ingredientKey));
+                ingredientGrid.appendChild(card);
+            });
+        }
+
+        function handleIngredientSelect(selectedIngredient) {
+            // Ignore clicks if game isn't started, is over, or penalty active
+            if (!gameHasStarted || isGameOver) return;
+
+            if (!targetPotionKey || !POTION_RECIPES[targetPotionKey]) {
+                console.error("Game Error: Target potion data missing."); return;
+            }
+            const targetRecipeSteps = POTION_RECIPES[targetPotionKey].steps;
+
+            if (stepsTaken < targetRecipeSteps.length) {
+                const expectedIngredient = targetRecipeSteps[stepsTaken];
+
+                if (selectedIngredient === expectedIngredient) {
+                    // --- Correct ingredient ---
+                    incorrectGuessesCurrentStep = 0; // Reset mistake counter
+                    stepsTaken++;
+                    currentRecipe.push(selectedIngredient);
+                    feedback.textContent = `Correct! Added ${selectedIngredient}.`;
+                    feedback.style.backgroundColor = '#dff0d8';
+                    updateDisplay();
+
+                    // Check for win condition
+                    if (stepsTaken === targetRecipeSteps.length) {
+                        isGameOver = true; const finalTimeMs = stopTimer();
+                        const finalTimeSec = finalTimeMs / 1000;
+                        let timeMessage = ` in ${finalTimeSec.toFixed(3)} seconds!`;
+                        if (finalTimeSec < 10) timeMessage += " Lightning!";
+                        else if (finalTimeSec > 60) timeMessage += " Perchance, have you taken a slowness potion recently?";
+                        feedback.textContent = `Success! You brewed the ${targetPotionKey}${timeMessage}`;
+                        feedback.style.backgroundColor = '#a8e6cf';
+                    }
+                } else {
+                    // --- Incorrect ingredient ---
+                    incorrectGuessesCurrentStep++;
+                    if (incorrectGuessesCurrentStep >= 3) {
+                         feedback.textContent = `Incorrect ingredient. Still need ${expectedIngredient}. Try again! (Penalty applied)`;
+                    } else {
+                         feedback.textContent = `Incorrect ingredient. Try again! (Penalty applied)`;
+                    }
+                    feedback.style.backgroundColor = '#f2dede';
+                    applyPenalty();
+                }
+            }
+        }
+
+        // Renamed: Sets up the game state without starting timer
+        function setupNewRound() {
+            targetPotionKey = getRandomPotionKey();
+            currentRecipe = [];
+            stepsTaken = 0;
+            isGameOver = false;
+            incorrectGuessesCurrentStep = 0;
+            if (penaltyTimeout) clearTimeout(penaltyTimeout);
+            removePenalty(); // Ensure cards are visually enabled
+            feedback.textContent = 'Select the first ingredient!';
+            feedback.style.backgroundColor = '#fffacd';
+            resetTimer(); // Reset timer display but don't start
+            updateDisplay();
+            populateIngredients(); // Populate with shuffled ingredients
+        }
+
+        // --- Event Listeners ---
+        startGameButton.addEventListener('click', () => {
+            startScreen.classList.add('hidden'); // Hide start screen
+            gameContainer.classList.remove('hidden'); // Show game container
+            gameHasStarted = true; // Set flag
+            setupNewRound(); // Setup the first round
+            startTimer(); // Start the timer for the first round
+        });
+
+        newGameButton.addEventListener('click', () => {
+            if (!gameHasStarted) return; // Should not happen, but safety check
+            setupNewRound(); // Setup the new round
+            startTimer(); // Start timer for the new round
+        });
+
+        // --- Initial Setup ---
+        // No automatic game start on load, just wait for button click
+        document.addEventListener('DOMContentLoaded', () => {
+             // Ensure start screen is visible and game is hidden initially
+             startScreen.classList.remove('hidden');
+             gameContainer.classList.add('hidden');
+        });
+
+    </script>
+</body>
+</html>

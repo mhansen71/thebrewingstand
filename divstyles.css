@@ -1,0 +1,48 @@
+.common{
+    position: absolute;
+}
+.nav{
+    position: relative;
+    float: right;
+    right: 10px;
+    /* font-size: 75%; */
+    text-transform: uppercase;
+}
+.footer{
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    text-align: center;
+    font-size: 50%;
+    font-style: italic;
+    background-color: rgba(169, 169, 169, 0.9);
+    color: black
+}
+.header{
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    text-align: center;
+    z-index: -1;
+}
+.content{
+    top: 150px;
+    left: 9%;
+    right: 9%;
+    background-color: rgba(66, 66, 66, 0.7);
+}
+
+.side-by-side{
+    margin: 0 5px;
+    display: flex;
+    position: relative;
+    align-items: center;
+    gap: 10px;
+}
+
+.side-by-side img {
+    border: 2px solid black;
+    max-width: 160px;
+    height: auto;
+}

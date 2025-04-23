@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitchell Hansen - Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles can be added here if needed */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Tailwind gray-50 */
+        }
+        /* Style for section headers */
+        .section-header {
+            border-bottom: 2px solid #e2e8f0; /* Tailwind gray-200 */
+            padding-bottom: 0.5rem; /* pb-2 */
+            margin-bottom: 1.5rem; /* mb-6 */
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 700; /* font-bold */
+            color: #1e293b; /* Tailwind slate-800 */
+        }
+        /* Style for individual entries (experience, education, etc.) */
+        .entry {
+            margin-bottom: 1.5rem; /* mb-6 */
+        }
+        /* Ensure last entry in a card doesn't have bottom margin */
+        .entry:last-child {
+             margin-bottom: 0;
+        }
+        .entry-title {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 500; /* font-medium */
+            color: #334155; /* Tailwind slate-700 */
+        }
+        .entry-subtitle {
+            font-size: 0.875rem; /* text-sm */
+            color: #64748b; /* Tailwind slate-500 */
+            margin-bottom: 0.25rem; /* mb-1 */
+        }
+        .entry-details {
+            font-size: 0.875rem; /* text-sm */
+            color: #475569; /* Tailwind slate-600 */
+            list-style: disc;
+            list-style-position: inside;
+            padding-left: 0.5rem; /* pl-2 */
+        }
+        /* Simple card styling for sections */
+        .card {
+            background-color: #ffffff; /* white */
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 1.5rem; /* p-6 */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow-md */
+            margin-bottom: 1.5rem; /* mb-6 */
+        }
+        /* Ensure last card/grid doesn't have bottom margin */
+         main > section:last-child, main > div:last-child {
+            margin-bottom: 0;
+         }
+    </style>
+</head>
+<body class="p-4 md:p-8 relative"> <div class="max-w-4xl mx-auto relative"> <a href="scratch.html" class="absolute top-0 right-0 mt-1 mr-1 text-sm text-blue-600 hover:underline z-10">
+            &larr; Scratch
+        </a>
+
+        <header class="text-center mb-8 md:mb-12 card">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-2">Mitchell Hansen</h1>
+            <div class="text-sm text-slate-600 flex flex-col md:flex-row justify-center items-center space-y-1 md:space-y-0 md:space-x-4">
+                <span>887 W 1000 S, Mapleton, UT 84664</span>
+                <span class="hidden md:inline">|</span>
+                <a href="tel:801-631-8533" class="hover:text-blue-600">(801) 631-8533</a>
+                <span class="hidden md:inline">|</span>
+                <a href="mailto:mitchdhansen@gmail.com" class="hover:text-blue-600">mitchdhansen@gmail.com</a>
+            </div>
+        </header>
+
+        <main>
+
+            <section class="card">
+                <h2 class="section-header">Work Experience</h2>
+
+                <div class="entry">
+                    <h3 class="entry-title">Night Coach</h3>
+                    <p class="entry-subtitle">The Heritage Community; Provo, UT | Jun 2024 - Mar 2025</p>
+                    </div>
+
+                <div class="entry">
+                    <h3 class="entry-title">Door-to-door Signature Collector</h3>
+                    <p class="entry-subtitle">Gather Industries; Springville, UT | Feb 2024 - Apr 2024</p>
+                    </div>
+
+                <div class="entry">
+                    <h3 class="entry-title">Specialty Wood Worker</h3>
+                    <p class="entry-subtitle">Wooden Things; Springville, UT | Jun 2021 - Oct 2021</p>
+                    </div>
+
+                <div class="entry">
+                    <h3 class="entry-title">Concessions Worker, Lifeguard</h3>
+                    <p class="entry-subtitle">Spanish Fork Parks and Rec.; Spanish Fork, UT | May 2020 - Sep 2020</p>
+                    </div>
+
+                <div class="entry">
+                    <h3 class="entry-title">Assistant Coach</h3>
+                    <p class="entry-subtitle">Rebound Basketball Academy; San Mateo, CA | Feb 2018 - May 2019</p>
+                    </div>
+            </section>
+
+            <section class="card">
+                <h2 class="section-header">Volunteer Experience</h2>
+
+                 <div class="entry">
+                    <h3 class="entry-title">Full-time Missionary</h3>
+                    <p class="entry-subtitle">The Church of Jesus Christ of Latter-Day Saints; Rancagua, Chile | Oct 2021 - Oct 2023</p>
+                    </div>
+
+                <div class="entry">
+                    <h3 class="entry-title">Eagle Scout</h3>
+                    <p class="entry-subtitle">Boy Scouts of America | Service project completed July 2019</p>
+                    <ul class="entry-details">
+                        <li>Service project involving humanitarian trip to Guatemala; 70+ total hours</li>
+                    </ul>
+                </div>
+
+                 <div class="entry">
+                    <h3 class="entry-title">Referee</h3>
+                    <p class="entry-subtitle">AYSO (American Youth Soccer Organization); San Mateo, CA | Aug 2018 - Nov 2018</p>
+                    </div>
+            </section>
+
+            <section class="card">
+                <h2 class="section-header">Education</h2>
+
+                <div class="entry">
+                    <h3 class="entry-title">Brigham Young University</h3>
+                    <p class="entry-subtitle">Provo, UT | Jan 2024 - Present</p>
+                    <ul class="entry-details">
+                        <li>Current GPA: 3.97</li>
+                        </ul>
+                </div>
+
+                <div class="entry">
+                    <h3 class="entry-title">Maple Mountain High School</h3>
+                    <p class="entry-subtitle">Spanish Fork, UT | Graduated 2021 (Diploma)</p>
+                     <ul class="entry-details">
+                        <li>ACT Score: 34</li>
+                        </ul>
+                </div>
+            </section>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <section class="card">
+                    <h2 class="section-header">Computer Skills</h2>
+                    <ul class="entry-details space-y-1">
+                        <li>Database Modeling</li>
+                        <li>SQL</li>
+                        <li>Flowcharting</li>
+                        <li>Excel & Excel Automation (VBA)</li>
+                        <li>Tableau (Data Analytics & Visualization)</li>
+                        <li>Solver (Optimization with Excel)</li>
+                        <li>Web Development (HTML, CSS)</li>
+                        <li>Python</li>
+                        <li>LLM Use</li>
+                    </ul>
+                </section>
+
+                <section class="card">
+                    <h2 class="section-header">Awards</h2>
+                    <ul class="entry-details space-y-1">
+                        <li>Eagle Scout (2019)</li>
+                        <li>2018 San Mateo AYSO Best New Referee of the Year</li>
+                        <li>AP Scholar Award</li>
+                        <li>Full-Tuition Academic Scholarship to BYU</li>
+                        <li>Various Other Academic Awards</li>
+                    </ul>
+                </section>
+
+                <section class="card">
+                    <h2 class="section-header">Languages</h2>
+                     <ul class="entry-details space-y-1">
+                        <li>English (Native)</li>
+                        <li>Spanish (Fluent)</li>
+                    </ul>
+                </section>
+            </div>
+
+        </main>
+
+    </div> </body>
+</html>
